@@ -1,0 +1,11 @@
+
+@media print {
+    body > :not(.print-page) {
+        display: none!important;
+    }
+}
+
+.print-page-layout {
+    page-break-after: always;
+    overflow: visible!important;
+}

@@ -16,8 +16,8 @@ const getAssignmentsSelector = createSelector(getDate, getAssignments, (date, as
     moment(date).isSame(moment(assignment.dueDateTime), 'week')
 ));
 
-const getType = createSelector(getTimetableState, (state) => state.currentTimeTableType);
-const getId = createSelector(getTimetableState, (state) => state.currentTimeTableId);
+const getType = (state, props) => props.type || state.timetable.currentTimeTableType;
+const getId = (state, props) => props.id || state.timetable.currentTimeTableId;
 const getPeriods = createSelector(getTimetableState, (state) => state.masterdata.Period_Time);
 
 const getIgnore = (state, props) => props && props.noSubstitutions;
