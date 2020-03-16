@@ -27,7 +27,7 @@ export default function LessonInformation({ lesson }) {
 
     return (
         <>
-            <ListSubheader >
+            <ListSubheader>
                 <SubstitutionText substitutionText={substitutionText} specificSubstitutionType={specificSubstitutionType}>
                 </SubstitutionText>
             </ListSubheader>

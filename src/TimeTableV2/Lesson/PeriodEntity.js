@@ -2,7 +2,7 @@ import React from 'react';
 import Absence from './Absence';
 import LessonEntity from './LessonEntity';
 
-export default function PeriodEntity({ lessons, supervision, type }) {
+export default function PeriodEntity({ lessons, supervision }) {
     // TODO: add supervision
     return (
         <>
@@ -18,7 +18,6 @@ export default function PeriodEntity({ lessons, supervision, type }) {
                         return (
                             <LessonEntity
                                 lesson={lesson}
-                                type={type}
                                 key={lesson.reference.TIMETABLE_ID || -i}
                             ></LessonEntity>
                         );

@@ -8,7 +8,7 @@ import { sendMail } from '../../Common/utils';
 import { addFavorite, removeFavorite } from '../actions';
 import { ObjectIcon } from './Avatars';
 
-const SearchItem = ({ onClick, selected, style, tv, object }) => {
+const SearchItem = ({ onClick, onContextMenu, selected, style, tv, object }) => {
     const { upn, type, text, secondary, favorite } = object;
     const dispatch = useDispatch();
 
@@ -17,7 +17,8 @@ const SearchItem = ({ onClick, selected, style, tv, object }) => {
 
     return (
         <div style={style}>
-            <ListItem dense button selected={selected} onClick={() => onClick(object)} style={{ height: style.height }}>
+            <ListItem dense button selected={selected} onClick={() => onClick(object)} style={{ height: style.height }}
+                onContextMenu={() => onContextMenu(object)}>
                 <ListItemIcon>
                     <ObjectIcon type={type} upn={upn} outline={true} size={40} />
                 </ListItemIcon>

@@ -1,5 +1,6 @@
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import blue from '@material-ui/core/colors/blue';
+import { indigo, blueGrey, grey, lime } from '@material-ui/core/colors';
 export default themeType =>
     createMuiTheme({
         typography: {
@@ -10,8 +11,19 @@ export default themeType =>
         palette: {
             type: themeType,
             primary: blue,
+            
         },
         overrides: {
            
+        },
+        lesson: {
+            primary: {
+                background: indigo[50],
+                colorBar: grey[400],
+            },
+            secondary: {
+                background: grey[200],
+                colorBar: grey[500],
+            },
         },
     });

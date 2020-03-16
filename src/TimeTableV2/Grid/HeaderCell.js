@@ -3,6 +3,7 @@ import ThemedGridCell from './ThemedGridCell';
 import { makeStyles } from '@material-ui/styles';
 import classNames from 'classnames';
 import { Typography } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 
 const useStyles = makeStyles(
     theme => ({
@@ -11,6 +12,10 @@ const useStyles = makeStyles(
             flexDirection: 'column',
             alignItems: 'center',
             padding: theme.spacing(0.5),
+        },
+        noswipe: {
+            backgroundColor: theme.palette.type === 'dark' ? theme.palette.background.paper : grey[200],
+
         },
         [theme.breakpoints.up('sm')]: {
             weekdayName: {
@@ -25,10 +30,10 @@ const useStyles = makeStyles(
     'HeaderCell'
 );
 
-export default function HeaderCell({ GridCellComponent, className, date, variant, ...other }) {
+export default function HeaderCell({ GridCellComponent, className, date, variant, mode, ...other }) {
     const classes = useStyles({ variant: variant });
     return (
-        <GridCellComponent {...other} className={classNames(classes.root, className)}>
+        <GridCellComponent {...other} className={classNames(classes.root, className, classes[mode])}>
             <Typography variant="body2" className={classes.weekdayName}>
                 {date.format('dddd')}
             </Typography>

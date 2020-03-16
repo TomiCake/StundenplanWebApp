@@ -21,8 +21,8 @@ function freeRooms(masterdata, day, periods) {
         let rooms = Object.values(masterdata.Room);
         const absencesFiltered = day.absences
             ? day.absences.filter(
-                  absence => absence.PERIOD_FROM - 1 <= y && absence.PERIOD_TO - 1 >= y && absence.room
-              )
+                absence => absence.PERIOD_FROM - 1 <= y && absence.PERIOD_TO - 1 >= y && absence.room
+            )
             : [];
 
         rooms = rooms.map(room => {
@@ -37,14 +37,14 @@ function freeRooms(masterdata, day, periods) {
     }
 }
 
-export function translateDay(masterdata, timetable, x, substitutions, periods, type, id, date, teams, assignments) {
-    let day = readTimetable(timetable, x, periods, date);
+export function translateDay(masterdata, timetables, x, substitutions, periods, profiles, date, teams, assignments) {
+    let day = readTimetable(timetables, x, periods, date, profiles);
     if (substitutions) {
-        joinSubstitutions(day, substitutions[x], type, id);
+        joinSubstitutions(day, substitutions, x, profiles);
     }
-    if (type !== 'all') {
+    // if (type !== 'all') {
         skipDuplications(day, periods);
-    }
+    // }
     let assignmentsOfDay = assignments.filter(assignment =>
         moment(assignment.dueDateTime).isSame(moment(date).weekday(x), 'day')
     );
@@ -53,66 +53,76 @@ export function translateDay(masterdata, timetable, x, substitutions, periods, t
         match: [],
     };
     translatePeriods(masterdata, day, periods, teams, assignmentsMatching);
-    if (type === 'all') {
-        freeRooms(masterdata, day, periods);
-    }
+    // if (type === 'all') {
+    // freeRooms(masterdata, day, periods);
+    // }
     day.unmatchedAssignments = assignmentsMatching.toMatch;
     return day;
 }
 
-function translateTimetable(masterdata, timetable, substitutions, periods, type, id, date, teams, assignments) {
+function translateTimetable(masterdata, timetable, substitutions, periods, profiles, date, teams, assignments) {
     if (!timetable || !masterdata || !substitutions) return null;
     periods = Object.values(periods);
     let data = [];
     for (let x = 0; x < WEEKDAY_NAMES.length; x++) {
-        data[x] = translateDay(masterdata, timetable, x, substitutions, periods, type, id, date, teams, assignments);
+        data[x] = translateDay(masterdata, timetable, x, substitutions, periods, profiles, date, teams, assignments);
     }
     return data;
 }
 
-function joinSubstitutions(day, subOnDay, type, id) {
-    if (!subOnDay) return;
-    if (subOnDay.holiday) {
-        day.holiday = subOnDay.holiday;
-        day.periods = undefined;
-        return;
-    }
-    if (subOnDay.substitutions && day.periods) {
-        subOnDay.substitutions.forEach(substitution => {
-            let period = day.periods[substitution.PERIOD - 1];
-            if (!period) return;
-            let lessons = period.lessons;
-            const lesson = specifySubstitutionType(id, type, substitution);
-            if (!lessons) {
-                period.lessons = lessons = [];
-            }
-            const index = lessons.findIndex(lesson => lesson.TIMETABLE_ID === substitution.TIMETABLE_ID);
-            if (index !== -1) {
-                lessons[index] = lesson ? { ...lessons[index], ...lesson } : null;
-                period.lessons = lessons.filter(c => c);
-            } else if (lesson) {
-                lessons.push(lesson);
-            }
-        });
-    }
-    if (subOnDay.supervisions) {
-        subOnDay.supervisions.forEach(supervision => {
-            const period = day.periods[supervision.PERIOD - 1];
-            period.supervision = supervision;
-        });
-    }
-    if (subOnDay.absences) {
-        // sort in table
-        subOnDay.absences.forEach(absence => {
-            for (let i = absence.PERIOD_FROM - 1; i < absence.PERIOD_TO; i++) {
-                const period = day.periods[i];
+function joinSubstitutions(day, substitutions, x, profiles) {
+    profiles.forEach((profile, i) => {
+        const substitutionsForProfile = substitutions[i];
+        if (!substitutionsForProfile) {
+            return;
+        }
+        const subOnDay = substitutionsForProfile[x];
+        if (!subOnDay) return;
+
+        if (subOnDay.holiday) {
+            day.holiday = subOnDay.holiday;
+            day.periods = undefined;
+            return;
+        }
+        if (subOnDay.substitutions && day.periods) {
+            subOnDay.substitutions.forEach(substitution => {
+                let period = day.periods[substitution.PERIOD - 1];
                 if (!period) return;
-                period.lessons = [...period.lessons, { absence }];
-            }
-        });
-        // sort in header
-        day.absences = subOnDay.absences;
-    }
+                let lessons = period.lessons;
+                const lesson = specifySubstitutionType(profile, substitution);
+                
+                if (!lessons) {
+                    period.lessons = lessons = [];
+                }
+                const index = lessons.findIndex(lesson => lesson.TIMETABLE_ID === substitution.TIMETABLE_ID && lesson.profile === profile);
+                if (index !== -1) {
+                    lessons[index] = lesson ? { ...lessons[index], ...lesson } : null;
+                    period.lessons = lessons.filter(c => c);
+                } else if (lesson) {
+                    lessons.push(lesson);
+                }
+            });
+        }
+        if (subOnDay.supervisions) {
+            subOnDay.supervisions.forEach(supervision => {
+                const period = day.periods[supervision.PERIOD - 1];
+                period.supervision = supervision;
+            });
+        }
+        if (subOnDay.absences) {
+            // sort in table
+            subOnDay.absences.forEach(absence => {
+                for (let i = absence.PERIOD_FROM - 1; i < absence.PERIOD_TO; i++) {
+                    const period = day.periods[i];
+                    if (!period) return;
+                    period.lessons = [...period.lessons, { absence }];
+                }
+            });
+            // sort in header
+            day.absences = subOnDay.absences;
+        }
+    });
+
 }
 function comparePeriod(current, next) {
     if (!next || !current) return false;
@@ -202,22 +212,22 @@ function skipTeacherDuplications(lessons) {
                 if (lesson.TEACHER_IDS)
                     last.TEACHER_IDS
                         ? lesson.TEACHER_IDS.forEach(item =>
-                              last.TEACHER_IDS.includes(item) ? null : last.TEACHER_IDS.push(item)
-                          )
+                            last.TEACHER_IDS.includes(item) ? null : last.TEACHER_IDS.push(item)
+                        )
                         : (last.TEACHER_IDS = lesson.TEACHER_IDS);
                 if (lesson.TEACHER_IDS_OLD)
                     last.TEACHER_IDS_OLD
                         ? lesson.TEACHER_IDS_OLD.forEach(item =>
-                              last.TEACHER_IDS_OLD.includes(item) ? null : last.TEACHER_IDS_OLD.push(item)
-                          )
+                            last.TEACHER_IDS_OLD.includes(item) ? null : last.TEACHER_IDS_OLD.push(item)
+                        )
                         : (last.TEACHER_IDS_OLD = lesson.TEACHER_IDS_OLD);
                 if (lesson.TEACHER_IDS_SUBSTITUTING)
                     last.TEACHER_IDS_SUBSTITUTING
                         ? lesson.TEACHER_IDS_SUBSTITUTING.forEach(item =>
-                              last.TEACHER_IDS_SUBSTITUTING.includes(item)
-                                  ? null
-                                  : last.TEACHER_IDS_SUBSTITUTING.push(item)
-                          )
+                            last.TEACHER_IDS_SUBSTITUTING.includes(item)
+                                ? null
+                                : last.TEACHER_IDS_SUBSTITUTING.push(item)
+                        )
                         : (last.TEACHER_IDS_SUBSTITUTING = lesson.TEACHER_IDS_SUBSTITUTING);
 
                 combineSubstitutions(last, lesson);
@@ -239,31 +249,41 @@ function combineSubstitutions(receiver, lesson) {
     }
 }
 
-function readTimetable(_data, day, periods, date) {
-    if (!_data) return {};
+function readTimetable(timetables, day, periods, date, profiles) {
+    if (!timetables) return {};
     let data = [];
     let timetableDate = moment(date)
         .weekday(0)
         .startOf('day')
         .add(day, 'day');
     for (let y = 0; y < periods.length; y++) {
-        let lessons = (_data[day] || [])[y + 1] || [];
-        if (lessons) {
-            lessons = lessons
-                .map(lesson => ({
-                    ...lesson,
-                    TEACHER_IDS: lesson.TEACHER_ID ? [lesson.TEACHER_ID] : [],
-                    TEACHER_ID: undefined,
-                }))
-                .filter(
-                    lesson =>
-                        lesson.DATE_FROM &&
-                        lesson.DATE_TO &&
-                        moment(lesson.DATE_FROM.date).isSameOrBefore(timetableDate) &&
-                        moment(lesson.DATE_TO.date).isSameOrAfter(timetableDate)
-                );
+        let combinedLessons;
+        for (let i = 0; i < profiles.length; i++) {
+            let profile = profiles[i];
+            let timetable = timetables[i];
+            if (!timetable || !profile) {
+                continue;
+            }
+            let lessons = (timetable[day] || [])[y + 1] || [];
+            if (lessons) {
+                lessons = lessons
+                    .map(lesson => ({
+                        ...lesson,
+                        TEACHER_IDS: lesson.TEACHER_ID ? [lesson.TEACHER_ID] : [],
+                        TEACHER_ID: undefined,
+                        profile: profile,
+                    }))
+                    .filter(
+                        lesson =>
+                            lesson.DATE_FROM &&
+                            lesson.DATE_TO &&
+                            moment(lesson.DATE_FROM.date).isSameOrBefore(timetableDate) &&
+                            moment(lesson.DATE_TO.date).isSameOrAfter(timetableDate)
+                    );
+            }
+            combinedLessons = combinedLessons ? combinedLessons.concat(lessons) : lessons;
         }
-        data[y] = { lessons };
+        data[y] = { lessons: combinedLessons };
     }
     return { periods: data, date: timetableDate };
 }
@@ -408,6 +428,7 @@ export function translateLesson(masterdata, lesson, teams = [], assignmentsMatch
         substitutionType: lesson.substitutionType,
         specificSubstitutionType: lesson.specificSubstitutionType,
         substitutionRemove: lesson.substitutionRemove,
+        profile: lesson.profile,
         teachers: {
             new: lesson.TEACHER_IDS && lesson.TEACHER_IDS.map(t => masterdata.Teacher[t]),
             old: lesson.TEACHER_IDS_OLD && lesson.TEACHER_IDS_OLD.map(t => masterdata.Teacher[t]),
@@ -475,9 +496,12 @@ const makeGetCurrentTimetable = () => {
         (date, assignments) =>
             assignments.filter(assignment => moment(date).isSame(moment(assignment.dueDateTime), 'week'))
     );
-
-    const getType = (state, props) => props.type || state.timetable.currentTimeTableType;
-    const getId = (state, props) => props.id || state.timetable.currentTimeTableId;
+    const getProfiles = (state, props) => {
+        if (props.profiles) {
+            return props.profiles;
+        }
+        return state.timetable.currentProfiles || [];
+    };
 
     const getPeriods = createSelector(
         "getPeriods",
@@ -490,28 +514,28 @@ const makeGetCurrentTimetable = () => {
     const getCurrentTimetableSelector = createSelector(
         "getCurrentTimetableSelector",
         getTimetables,
-        getType,
-        getId,
-        (timetables, type, id) => timetables[getTimetableCacheKey({ type, id })]
+        getProfiles,
+        (timetables, profiles) => profiles.map(profile => timetables[getTimetableCacheKey(profile)])
     );
 
     const getCurrentSubstitutionsSelector = createSelector(
         "getCurrentSubstitutionsSelector",
         getIgnore,
         getSubstitutions,
-        getType,
-        getId,
+        getProfiles,
         getWeekSelector,
         getYearSelector,
-        (ignore, substitutions, type, id, week, year) => {
+        (ignore, substitutions, profiles, week, year) => {
             if (ignore) {
                 return [];
             }
-            const sub = substitutions[getSubstitutionsCacheKey({ type, id })];
-            if (!sub) {
-                return null;
-            }
-            return sub.substitutions[`${year}-${week.toString().padStart(2, '0')}`];
+            return profiles.map(profile => {
+                const sub = substitutions[getSubstitutionsCacheKey(profile)];
+                if (!sub) {
+                    return null;
+                }
+                return sub.substitutions[`${year}-${week.toString().padStart(2, '0')}`];
+            });
         }
     );
 
@@ -521,8 +545,7 @@ const makeGetCurrentTimetable = () => {
         getCurrentTimetableSelector,
         getCurrentSubstitutionsSelector,
         getPeriods,
-        getType,
-        getId,
+        getProfiles,
         getDate,
         getTeams,
         getAssignmentsSelector,

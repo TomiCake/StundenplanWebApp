@@ -8,7 +8,8 @@ export function createMask(...masks) {
 export const transform = variant => (variant === 'old' ? transformOld : variant === 'new' ? transformNew : null);
 
 export const fromViewer = substitution => {
-    const { id, type } = substitution;
+    const { profile } = substitution;
+    const { id, type } = profile;
     if (type === 'student' || type === 'class') {
         return transform('new')(substitution);
     }

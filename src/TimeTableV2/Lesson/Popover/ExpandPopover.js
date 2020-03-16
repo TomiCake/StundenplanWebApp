@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Popper from '@material-ui/core/Popper';
-import { withStyles, RootRef, ClickAwayListener, Collapse } from '@material-ui/core';
+import { withStyles, RootRef, ClickAwayListener, Collapse, Paper } from '@material-ui/core';
 import Lesson from '../Lesson';
 
 const styles = theme => ({
@@ -86,11 +86,11 @@ class ExpandPopover extends React.PureComponent {
                     {({ TransitionProps }) => (
                         <ClickAwayListener onClickAway={this.handleClickAway}>
                             <div>
-                                <Lesson className={classes.paper}>
+                                <Paper className={classes.paper}>
                                     <Collapse {...TransitionProps} appear style={{ overflowX: 'hidden' }}>
                                         {this.props.children}
                                     </Collapse>
-                                </Lesson>
+                                </Paper>
                             </div>
                         </ClickAwayListener>
                     )}

@@ -11,14 +11,14 @@ const useStyles = makeStyles(
             display: 'flex',
             flexGrow: 1,
             backgroundColor: props =>
-                props.backgroundColor || darken(indigo[50], theme.palette.type === 'dark' ? 0.6 : 0),
+                props.backgroundColor || theme.lesson.secondary.background,
             paddingRight: theme.spacing(0.5),
         },
         colorBar: {
             width: 3,
             marginRight: theme.spacing(0.5),
             flexShrink: 0,
-            backgroundColor: props => props.color || grey[400],
+            backgroundColor: props => props.color || theme.lesson.secondary.colorBar,
         },
     }),
     { name: 'Lesson' }

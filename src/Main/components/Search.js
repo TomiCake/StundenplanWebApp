@@ -26,9 +26,8 @@ class Search extends React.PureComponent {
         }
     };
 
-    handleClick = obj => {
+    handleClick = () => {
         this.setState({ open: false, value: '' });
-        this.props.setTimetable(obj);
     };
 
     handleKeyboardInput = transform => {
@@ -172,7 +171,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    setTimetable: object => dispatch(setTimeTable(object.type, object.id)),
     loadMe: () => dispatch(loadMe()),
 });
 

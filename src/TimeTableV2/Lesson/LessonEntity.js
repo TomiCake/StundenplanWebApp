@@ -5,12 +5,12 @@ import { equalPeriods } from '../../Selector/timetable';
 import ExpandLesson from './Popover/ExpandLesson';
 import LessonBadge from './LessonBadge';
 
-function LessonEntity({ type, lesson }) {
+function LessonEntity({ lesson }) {
     return (
         <ExpandLesson lesson={lesson}>
-            <LessonBadge type={type} lesson={lesson}>
+            <LessonBadge lesson={lesson}>
                 <Lesson specificSubstitutionType={lesson.specificSubstitutionType}>
-                    <LessonContent type={type} lesson={lesson}></LessonContent>
+                    <LessonContent lesson={lesson}></LessonContent>
                 </Lesson>
             </LessonBadge>
         </ExpandLesson>

@@ -13,9 +13,9 @@ function normalize(v) {
     return v || (v === 0 ? 0 : undefined);
 }
 
-export function specifySubstitutionType(id, type, substitution) {
+export function specifySubstitutionType(profile, substitution) {
     let lesson = {};
-    substitution = { ...substitution, id: Number(id), type };
+    substitution = { ...substitution, profile };
 
     if (substitution.TEXT === 'Methodenkompetenz') {
         substitution.TYPE = 'METH_COMP';
@@ -51,6 +51,7 @@ export function specifySubstitutionType(id, type, substitution) {
     lesson.substitutionText = window.params.sortBy !== 'teacher' ? substitution.TEXT : substitution.TEXT_TEACHER;
     lesson.isOld = substitution.isOld;
     lesson.substitutionInfo = substitution.substitutionInfo;
+    lesson.profile = substitution.profile;
     return lesson;
 }
 export function getSpecificSubstitutionType(substitution) {

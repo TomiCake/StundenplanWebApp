@@ -139,7 +139,7 @@ class GridSwiperComponent extends React.Component {
         return {
             x: 0,
             // https://www.react-spring.io/docs/hooks/api
-            config: { duration: 200 },
+            
             onRest: () => {
                 this.swiping = false;
                 if (this.tempIndex !== this.state.index) {

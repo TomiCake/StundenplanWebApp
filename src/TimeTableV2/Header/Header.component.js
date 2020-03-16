@@ -1,19 +1,11 @@
 import React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
-import moment from 'moment';
 import BackIcon from '@material-ui/icons/ArrowBack';
 import NextIcon from '@material-ui/icons/ArrowForward';
 import ResetIcon from '@material-ui/icons/ArrowDownward';
 import grey from '@material-ui/core/colors/grey';
 import classNames from 'classnames';
-import OfflinePin from '@material-ui/icons/OfflinePin';
-import TableHead from '@material-ui/core/TableHead';
-import Table from '@material-ui/core/Table';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import { Typography, ListItem, ListItemIcon } from '@material-ui/core';
 import TimetableInformation from './TimetableInformation';
 
 const styles = theme => ({

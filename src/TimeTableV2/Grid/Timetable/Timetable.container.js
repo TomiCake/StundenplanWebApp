@@ -7,7 +7,6 @@ const mapStateToProps = () => {
     return (state, props) => {
         return {
             timetable: getCurrentTimetable(state, props),
-            type: state.timetable.currentTimeTableType,
         }
     }
 }

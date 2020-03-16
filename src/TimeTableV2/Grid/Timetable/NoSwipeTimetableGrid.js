@@ -8,9 +8,9 @@ function NoSwipeTimetableGrid({ periods }) {
     const rows = useRows(periods);
 
     return (
-        <TimetableContainer GridCellComponent={ThemedGridCell} rows={rows}>
+        <TimetableContainer GridCellComponent={ThemedGridCell} rows={rows} mode="noswipe">
             {rows.map((row, i) => {
-                const Comp = row.component || ThemedGridCell;
+                const Comp = row.noSwipeComponent || ThemedGridCell;
 
                 return <Comp {...row}></Comp>;
             })}

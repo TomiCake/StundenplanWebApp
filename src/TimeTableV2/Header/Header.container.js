@@ -7,8 +7,6 @@ import { changeWeek } from '../../Main/actions';
 const mapStateToProps = (state, props) => ({
     lastCheck: !state.online.counter && moment(state.user.lastCheck).fromNow(),
     offline: !state.online.counter,
-    id: state.timetable.currentTimeTableId,
-    type: state.timetable.currentTimeTableType,
     date: state.timetable.timetableDate,
     isMin: state.timetable.dateIsMin,
     isMax: state.timetable.dateIsMax,

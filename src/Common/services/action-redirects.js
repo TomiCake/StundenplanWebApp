@@ -6,23 +6,25 @@ const actionRedirector = store => next => action => {
         case 'NETWORK_ONLINE':
         case 'GET_TIMETABLE':
         case 'SET_TIMETABLE':
+        case 'ADD_TIMETABLE':
         case 'SET_MY_TIMETABLE':
         case 'GET_ME_RECEIVED':
         case 'COUNTER_CHANGED':
         case 'COUNTER_RECEIVED':
         case 'CHANGE_WEEK':
         case 'SET_DATE': {
-            let { currentTimeTableId, currentTimeTableType } = store.getState().timetable;
-            let { id, type } = action.payload || {};
-            id = id || currentTimeTableId;
-            type = type || currentTimeTableType;
-            if (id && type) {
-                next({ type: 'GET_TIMETABLE', payload: { id, type } });
+            let { currentProfiles } = store.getState().timetable;
+            let profileIn = action.payload;
+            let profiles = (profileIn && profileIn.type && profileIn.id) ? [profileIn] : (currentProfiles || []);
+            profiles.forEach(profile => {
+                if (!profile) return;
+                next({ type: 'GET_TIMETABLE', payload: profile });
                 next({
                     type: 'GET_SUBSTITUTIONS',
-                    payload: { id, type, },
+                    payload: profile,
                 });
-            }
+            })
+
             break;
         }
         default:

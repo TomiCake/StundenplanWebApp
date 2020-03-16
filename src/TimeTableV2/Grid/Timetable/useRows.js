@@ -10,6 +10,7 @@ export default function useRows(periods) {
             {
                 key: -1,
                 swipeComponent: HeaderBackground,
+                noSwipeComponent: HeaderBackground,
                 type: 'header',
             },
             {
@@ -24,11 +25,13 @@ export default function useRows(periods) {
                     type: 'main',
                     swipeComponent: TimetablePeriodCell,
                     component: PeriodCell,
+                    noSwipeComponent: PeriodCell,
                 };
             }),
             {
                 key: -4,
                 swipeComponent: HeaderBackground,
+                noSwipeComponent: HeaderBackground,
                 type: 'header',
                 variant: 'small',
             },

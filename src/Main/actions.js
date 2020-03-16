@@ -119,6 +119,10 @@ export function setTimeTable(type, id) {
     return { type: 'SET_TIMETABLE', payload: { type, id } };
 }
 
+export function addTimeTable(type, id) {
+    return { type: 'ADD_TIMETABLE', payload: { type, id } };
+}
+
 export function changeTheme(type) {
     return { type: 'CHANGE_THEME', payload: type };
 }

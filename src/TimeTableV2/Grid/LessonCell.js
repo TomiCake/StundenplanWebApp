@@ -16,11 +16,11 @@ const useStyles = makeStyles(
     'LessonCell'
 );
 
-export default function LessonCell({ lessons, type, GridCellComponent, className, children, ...other }) {
+export default function LessonCell({ lessons, GridCellComponent, className, children, ...other }) {
     const classes = useStyles({ multiple: lessons && lessons.length > 1});
     return (
         <GridCellComponent {...other} className={classNames(classes.root, className)}>
-            {children || <PeriodEntity lessons={lessons} type={type}></PeriodEntity>}
+            {children || <PeriodEntity lessons={lessons}></PeriodEntity>}
         </GridCellComponent>
     )
 }

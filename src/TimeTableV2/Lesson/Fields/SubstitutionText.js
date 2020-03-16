@@ -1,12 +1,12 @@
 import React from 'react';
-import { makeStyles, Tooltip } from '@material-ui/core';
+import { makeStyles, Tooltip, Typography } from '@material-ui/core';
 import useSpecificSubsitutionType from '../useSpecificSubsitutionType';
 
 
 const useStyles = makeStyles(theme => ({
     root: {
         color: props => props.color,
-        fontSize: theme.typography.pxToRem(12),
+        fontSize: theme.typography.pxToRem(11),
         fontWeight: 600,
     }
 }), { name: "SubstitutionText" });
@@ -21,16 +21,10 @@ export default function SubstitutionText({ substitutionText, specificSubstitutio
     // use the text that is shorter
     
     const textMain = texts[0];
-    const textTooltip = texts[1];
 
     return (
-        <div className={classes.root}>
-            {textTooltip ?
-                <Tooltip title={textTooltip}>
-                    <div>{textMain}</div>
-                </Tooltip>
-                : textMain
-            }
-        </div>
+        <Typography className={classes.root} variant="subtitle2" noWrap>
+            {textMain}
+        </Typography>
     )
 }

@@ -67,28 +67,30 @@ export default function timetableReducer(state = initialState, action = {}) {
         case 'GET_ME_RECEIVED':
             return {
                 ...state,
-                currentTimeTableType: state.currentTimeTableType || action.payload.type,
-                currentTimeTableId: state.currentTimeTableId || action.payload.id,
+                currentProfiles: [action.payload],
             };
         case 'SET_TIMETABLE':
             return {
                 ...state,
-                currentTimeTableType: action.payload.type,
-                currentTimeTableId: action.payload.id,
+                currentProfiles: [action.payload],
             };
+        case 'ADD_TIMETABLE':
+            return {
+                ...state,
+                currentProfiles: [...state.currentProfiles, action.payload]
+            }
         case 'CHANGE_WEEK':
         case 'SET_DATE':
         case 'SET_MY_TIMETABLE':
-            let { id, type } = action.payload;
             let { min, max } = state;
             min = moment(min);
             max = moment(max);
-
+            let payload = action.payload;
             let newDate;
-            if (action.payload.direction && action.payload.direction !== 'now') {
-                newDate = moment(state.timetableDate).add(action.payload.direction, 'week');
-            } else if (action.payload.date) {
-                newDate = moment(action.payload.date);
+            if (payload.direction && payload.direction !== 'now') {
+                newDate = moment(state.timetableDate).add(payload.direction, 'week');
+            } else if (payload.date) {
+                newDate = moment(payload.date);
             } else {
                 newDate = moment().isoWeekday() >= 6 ? moment().add(1, 'isoWeek') : moment();
             }
@@ -96,8 +98,7 @@ export default function timetableReducer(state = initialState, action = {}) {
 
             return {
                 ...state,
-                currentTimeTableId: id || state.currentTimeTableId,
-                currentTimeTableType: type || state.currentTimeTableType,
+                currentProfiles: (payload.type && payload.id) ? [payload] : state.currentProfiles,
                 timetableDate,
                 dateIsMin: timetableDate.isSame(min, 'week'),
                 dateIsMax: timetableDate.isSame(max, 'week'),

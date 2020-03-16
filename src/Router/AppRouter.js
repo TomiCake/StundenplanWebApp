@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setNotification, 
-     sendLoginStatistic, changeTheme, setSortBy } from '../Main/actions';
+import { setNotification, sendLoginStatistic, changeTheme, setSortBy } from '../Main/actions';
 import {ThemeProvider} from '@material-ui/core/styles';
 import createTheme from '../Common/theme';
 import MomentUtils from '@date-io/moment';
@@ -37,6 +36,7 @@ class AppRouter extends Component {
     }
 
     render() {
+        console.log(this.state.theme);
         return (
             <Router>
                 <ThemeProvider theme={this.state.theme}>

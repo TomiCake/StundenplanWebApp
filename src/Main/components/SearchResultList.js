@@ -6,6 +6,7 @@ import VList from 'react-virtualized/dist/commonjs/List';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import makeStyles from '@material-ui/styles/makeStyles';
 import useKeyPress from '../../Common/hooks/useKeyDown';
+import { setTimeTable, addTimeTable } from '../actions';
 
 const useStyles = makeStyles(theme => ({
     overflow: {
@@ -14,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SearchResult = ({ results, onClick }) => {
+const SearchResult = ({ results, onClick, addTimeTable, setTimeTable }) => {
     const classes = useStyles();
     const [selected, setSelected] = useState(0);
     const small = useSelector(state => state.browser.lessThan.medium);
@@ -29,6 +30,17 @@ const SearchResult = ({ results, onClick }) => {
             onClick(results[selected]);
         }
     });
+
+    function handleClick(mode) {    
+        return (object) => {
+            onClick(object);
+            if (mode === 'add') {
+                addTimeTable(object);
+            } else if (mode === 'set') {
+                setTimeTable(object);
+            }
+        }
+    }
 
     useEffect(() => {
         setSelected(0);
@@ -48,7 +60,8 @@ const SearchResult = ({ results, onClick }) => {
                                 <SearchItem
                                     key={key}
                                     object={object}
-                                    onClick={onClick}
+                                    onClick={handleClick('set')}
+                                    onContextMenu={handleClick('add')}
                                     selected={!small && selected === index}
                                     style={style}
                                 />
@@ -71,4 +84,12 @@ const makeMapStateToProps = () => {
     });
 };
 
-export default connect(makeMapStateToProps)(SearchResult);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setTimeTable: (obj) => dispatch(setTimeTable(obj.type, obj.id)),
+        addTimeTable: (obj) => dispatch(addTimeTable(obj.type, obj.id)),
+
+    };
+};
+
+export default connect(makeMapStateToProps, mapDispatchToProps)(SearchResult);
